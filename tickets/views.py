@@ -4,6 +4,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import Ticket, Assignment
 from .forms import UserRegistrationForm,TicketCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 
 def register_view(request):
@@ -43,13 +47,29 @@ def create_ticket_view(request):
             ticket = form.save(commit=False)
             ticket.created_by = request.user
             ticket.save()
-            
-            #assign the ticket to the creator by default
-            Assignment.objects.create(ticket=ticket, assigned_user=request.user)
+            # Get the assigned users
+            assigned_users = form.cleaned_data['assigned_users']
+            # Assign the ticket to the selected users
+            for user in assigned_users:
+                Assignment.objects.create(ticket=ticket, assigned_user=user)
+                # Send a notification email to the user
+                send_assignment_notification(user, ticket)
             return redirect('ticket_list')
     else:
         form = TicketCreationForm()
     return render(request, 'create_ticket.html', {'form': form})
+
+def send_assignment_notification(user, ticket):
+    # Send email notification to the assigned user
+    subject = f"You have been assigned to a ticket: {ticket.title}"
+    message = f"Hello {user.username},\n\nYou have been assigned to the ticket: {ticket.title}.\n\nDetails:\nTitle: {ticket.title}\nPriority: {ticket.priority}\nStatus: {ticket.status}\n\nThank you."
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently=False,
+    )
 
 @login_required
 def ticket_list_view(request):

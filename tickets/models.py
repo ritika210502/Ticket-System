@@ -32,4 +32,5 @@ class Assignment(models.Model):
     assigned_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.assigned_user} assigned to {self.ticket}"
+        return f"{self.assigned_user.email} assigned to {self.ticket.title}"
+

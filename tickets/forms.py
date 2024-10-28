@@ -27,7 +27,14 @@ class UserRegistrationForm(forms.ModelForm):
         return user
 
 class TicketCreationForm(forms.ModelForm):
+    assigned_users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True
+    )
+
     class Meta:
         model = Ticket
-        fields = ['title', 'description', 'priority']
+        fields = ['title', 'description', 'priority', 'assigned_users']
+
 
