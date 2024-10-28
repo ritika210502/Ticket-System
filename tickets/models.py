@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Ticket(models.Model):
     STATUS_CHOICES = [
@@ -33,4 +34,13 @@ class Assignment(models.Model):
 
     def __str__(self):
         return f"{self.assigned_user.email} assigned to {self.ticket.title}"
+
+class Activity(models.Model):
+    ticket = models.ForeignKey('Ticket', on_delete=models.CASCADE, related_name='activities')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=255)  # e.g., "Status updated to In Progress"
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.action} at {self.timestamp}"
 

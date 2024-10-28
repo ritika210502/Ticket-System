@@ -37,4 +37,10 @@ class TicketCreationForm(forms.ModelForm):
         model = Ticket
         fields = ['title', 'description', 'priority', 'assigned_users']
 
+class TicketStatusUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['status']
 
+class CommentForm(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea, label='Add a comment')

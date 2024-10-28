@@ -1,0 +1,13 @@
+<h2>Update Status for Ticket: {{ ticket.title }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="status">Select new status:</label>
+    <select name="status">
+        <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
+        <option value="in_progress" {% if ticket.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+        <option value="resolved" {% if ticket.status == 'resolved' %}selected{% endif %}>Resolved</option>
+        <option value="closed" {% if ticket.status == 'closed' %}selected{% endif %}>Closed</option>
+    </select>
+    <button type="submit">Update Status</button>
+</form>
+<a href="{% url 'ticket_activity' ticket.id %}">Back to Activity</a>

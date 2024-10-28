@@ -1,14 +1,38 @@
-<h2>My Tickets</h2>
-<h3>Created Tickets</h3>
-<ul>
-    {% for ticket in created_tickets %}
-        <li>{{ ticket.title }} - {{ ticket.status }}</li>
-    {% endfor %}
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Tickets</title>
+</head>
+<body>
+    <h2>My Tickets</h2>
 
-<h3>Assigned Tickets</h3>
-<ul>
-    {% for ticket in assigned_tickets %}
-        <li>{{ ticket.title }} - {{ ticket.status }}</li>
+    {% for item in tickets_with_recent_activity %}
+        <div class="ticket">
+            <h3>{{ item.ticket.title }}</h3>
+            <p><strong>Status:</strong> {{ item.ticket.get_status_display }}</p>
+            <p><strong>Priority:</strong> {{ item.ticket.get_priority_display }}</p>
+            <p><strong>Assigned Users:</strong> 
+                {% for assignment in item.ticket.assignments.all %}
+                    {{ assignment.assigned_user.username }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            
+            {% if item.recent_activity %}
+                <p><strong>Recent Activity:</strong> 
+                    {{ item.recent_activity.timestamp }} - 
+                    {{ item.recent_activity.user.username }}: 
+                    {{ item.recent_activity.action }}
+                </p>
+            {% else %}
+                <p><strong>Recent Activity:</strong> No recent activity</p>
+            {% endif %}
+            
+            <p><a href="{% url 'ticket_activity' item.ticket.id %}">View Activity</a></p>
+        </div>
+        <hr>
     {% endfor %}
-</ul>
+
+    <a href="{% url 'create_ticket' %}">Create New Ticket</a>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<h2>Activity for Ticket: {{ ticket.title }}</h2>
+<ul>
+    {% for activity in activities %}
+        <li>
+            <strong>{{ activity.timestamp }}</strong> - {{ activity.user.username }}: {{ activity.action }}
+        </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'update_ticket_status' ticket.id %}">Update Status</a> |
+<a href="{% url 'add_comment' ticket.id %}">Add Comment</a> |
+<a href="{% url 'ticket_list' %}">Back to Ticket List</a>
