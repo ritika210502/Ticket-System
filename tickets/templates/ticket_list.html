@@ -1,0 +1,14 @@
+<h2>My Tickets</h2>
+<h3>Created Tickets</h3>
+<ul>
+    {% for ticket in created_tickets %}
+        <li>{{ ticket.title }} - {{ ticket.status }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Assigned Tickets</h3>
+<ul>
+    {% for ticket in assigned_tickets %}
+        <li>{{ ticket.title }} - {{ ticket.status }}</li>
+    {% endfor %}
+</ul>

@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Ticket
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -24,3 +25,9 @@ class UserRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+class TicketCreationForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['title', 'description', 'priority']
+
