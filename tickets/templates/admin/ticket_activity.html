@@ -1,0 +1,6 @@
+<h1>Activity for Ticket: {{ ticket.title }}</h1>
+<ul>
+    {% for activity in activities %}
+        <li>{{ activity.timestamp }} - {{ activity.user.username }}: {{ activity.action }}</li>
+    {% endfor %}
+</ul>

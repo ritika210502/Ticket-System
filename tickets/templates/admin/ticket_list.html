@@ -1,0 +1,29 @@
+<h1>All Tickets</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Assigned Users</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket_info in tickets_with_recent_activity %}
+            <tr>
+                <td>{{ ticket_info.ticket.title }}</td>
+                <td>{{ ticket_info.ticket.status }}</td>
+                <td>
+                    {% for assignment in ticket_info.ticket.assignments.all %}
+                        {{ assignment.assigned_user.username }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'admin_update_ticket' ticket_info.ticket.id %}">Update</a>
+                    <a href="{% url 'admin_assign_ticket' ticket_info.ticket.id %}">Assign Users</a>
+                    <a href="{% url 'admin_ticket_activity' ticket_info.ticket.id %}">View Activity</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

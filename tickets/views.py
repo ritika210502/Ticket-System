@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from itertools import chain
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 @login_required
 def home_view(request):
@@ -75,7 +77,7 @@ def create_ticket_view(request):
             return redirect('ticket_list')
     else:
         form = TicketCreationForm()
-    return render(request, 'create_ticket.html', {'form': form})
+    return render(request, 'ticket/create_ticket.html', {'form': form})
 
 @login_required
 def update_ticket_status_view(request, ticket_id):
@@ -98,9 +100,9 @@ def update_ticket_status_view(request, ticket_id):
                 action=f"Status updated to {new_status}"
             )
             send_notification('update_status', ticket, request.user, {'new_status': new_status})  # Send status update notification
-        return redirect('ticket_activity', ticket_id=ticket.id)
+        return redirect('ticket/ticket_activity', ticket_id=ticket.id)
 
-    return render(request, 'update_ticket_status.html', {'ticket': ticket})
+    return render(request, 'ticket/update_ticket_status.html', {'ticket': ticket})
 
 @login_required
 def add_comment_view(request, ticket_id):
@@ -122,10 +124,10 @@ def add_comment_view(request, ticket_id):
                 action=f"Comment: {comment}"
             )
             send_notification('comment', ticket, request.user, {'comment': comment})  # Send comment notification
-            return redirect('ticket_activity', ticket_id=ticket.id)
+            return redirect('ticket/ticket_activity', ticket_id=ticket.id)
     else:
         form = CommentForm()
-    return render(request, 'add_comment.html', {'form': form, 'ticket': ticket})
+    return render(request, 'ticket/add_comment.html', {'form': form, 'ticket': ticket})
 
 
 def send_notification(action_type, ticket, user, additional_info=None):
@@ -196,7 +198,7 @@ def ticket_list_view(request):
             'recent_activity': recent_activity
         })
 
-    return render(request, 'ticket_list.html', {
+    return render(request, 'ticket/ticket_list.html', {
         'tickets_with_recent_activity': tickets_with_recent_activity,
     })
 
@@ -211,7 +213,7 @@ def ticket_activity_view(request, ticket_id):
         return redirect('ticket_list')  # Redirect back to the list view with an error
 
     activities = ticket.activities.filter(action__icontains="Status updated").order_by('-timestamp')
-    return render(request, 'ticket_activity.html', {'ticket': ticket, 'activities': activities})
+    return render(request, 'ticket/ticket_activity.html', {'ticket': ticket, 'activities': activities})
 
 @login_required
 def notification_list_view(request):
@@ -224,3 +226,74 @@ def mark_notification_as_read_view(request, notification_id):
     notification.is_read = True
     notification.save()
     return redirect('notification_list')
+
+
+@staff_member_required
+@login_required
+def admin_ticket_list_view(request):
+    # Get all tickets in the system
+    tickets = Ticket.objects.all()
+    tickets_with_recent_activity = []
+    
+    for ticket in tickets:
+        recent_activity = ticket.activities.order_by('-timestamp').first()
+        tickets_with_recent_activity.append({
+            'ticket': ticket,
+            'recent_activity': recent_activity
+        })
+
+    return render(request, 'admin/ticket_list.html', {
+        'tickets_with_recent_activity': tickets_with_recent_activity,
+    })
+
+@staff_member_required
+@login_required
+def admin_assign_ticket_view(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if request.method == 'POST':
+        assigned_users = request.POST.getlist('assigned_users')  # Assuming a multiple select input
+        for user_id in assigned_users:
+            user = User.objects.get(id=user_id)
+            Assignment.objects.create(ticket=ticket, assigned_user=user)
+            # Log assignment activity
+            Activity.objects.create(
+                ticket=ticket,
+                user=request.user,
+                action=f"Assigned to ticket {ticket.title}"
+            )
+        messages.success(request, "Users successfully assigned to the ticket.")
+        return redirect('admin_ticket_list')  # Redirect to the ticket list
+
+    # Fetch all users for the assignment form
+    users = User.objects.all()
+    return render(request, 'admin/assign_ticket.html', {'ticket': ticket, 'users': users})
+
+@staff_member_required
+@login_required
+def admin_update_ticket_view(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if request.method == 'POST':
+        form = TicketStatusUpdateForm(request.POST, instance=ticket)
+        if form.is_valid():
+            form.save()
+            # Log the update as an activity
+            Activity.objects.create(
+                ticket=ticket,
+                user=request.user,
+                action="Ticket updated"
+            )
+            messages.success(request, "Ticket status updated.")
+            return redirect('admin_ticket_list')
+    else:
+        form = TicketStatusUpdateForm(instance=ticket)
+
+    return render(request, 'admin/update_ticket.html', {'form': form, 'ticket': ticket})
+
+@staff_member_required
+@login_required
+def admin_ticket_activity_view(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    activities = ticket.activities.order_by('-timestamp')  # Fetch all activities for the ticket
+    return render(request, 'admin/ticket_activity.html', {'ticket': ticket, 'activities': activities})

@@ -1,7 +1,0 @@
-<h2>Add Comment for Ticket: {{ ticket.title }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Comment</button>
-</form>
-<a href="{% url 'ticket_activity' ticket.id %}">Back to Activity</a>
