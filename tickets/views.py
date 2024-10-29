@@ -202,8 +202,9 @@ def register_view(request):
             form.save()
             return redirect('login')
     else:
+        form.add_error(None, "Invalid detail provide")
         form = UserRegistrationForm()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -218,7 +219,7 @@ def login_view(request):
             form.add_error(None, "Invalid email or password.")
     else:
         form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'registration/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)

@@ -1,8 +1,14 @@
+<!-- templates/ticket/login.html -->
 <h2>Login</h2>
 <form method="post">
     {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div style="color: red;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
     <div>
-        <label for="email">Email:</label>
+        <label for="username">Email:</label>
         <input type="text" name="username" required>
     </div>
     <div>

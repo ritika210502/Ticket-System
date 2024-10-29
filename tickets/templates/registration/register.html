@@ -1,0 +1,43 @@
+<!-- templates/registration/register.html -->
+<h2>Register</h2>
+<form method="post">
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+        <div style="color: red;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+    
+    <div>
+        <label for="email">Email:</label>
+        {{ form.email }}  <!-- This should render the email field -->
+        {% if form.email.errors %}
+            <div style="color: red;">
+                {{ form.email.errors }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="password">Password:</label>
+        {{ form.password }}  <!-- This should render the password field -->
+        {% if form.password.errors %}
+            <div style="color: red;">
+                {{ form.password.errors }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        <label for="confirm_password">Confirm Password:</label>
+        {{ form.confirm_password }}  <!-- This should render the confirm password field -->
+        {% if form.confirm_password.errors %}
+            <div style="color: red;">
+                {{ form.confirm_password.errors }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <button type="submit">Register</button>
+</form>

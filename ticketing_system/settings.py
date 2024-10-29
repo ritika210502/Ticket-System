@@ -95,9 +95,10 @@ DATABASES = {
     }
 
 }
+LOGIN_URL = '/accounts/login/'  # Redirect to this URL if not logged in
+LOGIN_REDIRECT_URL = '/'  # Where to go after logging in (e.g., home)
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # Where to go after logging out
 
-LOGIN_REDIRECT_URL = '/login/'
-LOGOUT_REDIRECT_URL = '/login/'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
