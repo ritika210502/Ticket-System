@@ -1,0 +1,17 @@
+<h2>Your Notifications</h2>
+<ul>
+    {% for notification in notifications %}
+        <li>
+            <strong>{{ notification.timestamp }}:</strong>
+            {{ notification.message }}
+            {% if not notification.is_read %}
+                <form action="{% url 'mark_notification_as_read' notification.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Mark as read</button>
+                </form>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>No notifications found.</li>
+    {% endfor %}
+</ul>
