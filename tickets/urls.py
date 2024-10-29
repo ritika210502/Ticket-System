@@ -7,5 +7,6 @@ urlpatterns = [
     path('ticket/<int:ticket_id>/activity/', views.ticket_activity_view, name='ticket_activity'),
     path('ticket/<int:ticket_id>/update-status/', views.update_ticket_status_view, name='update_ticket_status'),
     path('ticket/<int:ticket_id>/add-comment/', views.add_comment_view, name='add_comment'),
+    # path('notifications/', views.notification_list_view, name='notification_list'),
 
 ]
